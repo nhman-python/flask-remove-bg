@@ -5,6 +5,8 @@ import markupsafe
 from flask import url_for, render_template, flash, send_from_directory, redirect, session, Blueprint, request, abort
 from werkzeug.utils import secure_filename
 import os
+from rembg import remove
+from PIL import UnidentifiedImageError
 from werkzeug.security import safe_join
 from wtforms import FileField, SubmitField
 from flask_wtf.file import FileAllowed
@@ -17,19 +19,6 @@ allow_extension = ['png', 'jpeg', 'jpg']
 UPLOAD_FOLDER = 'static/upload'
 
 
-async def recaptcha_validation(recaptcha_response):
-    recaptcha_secret_key = '0xCF8b6205862D8f5603b4B7d30e519702134C3B87'
-    verification_url = 'https://api.hcaptcha.com/siteverify'
-    data = {
-        'secret': recaptcha_secret_key,
-        'response': recaptcha_response
-    }
-
-    async with httpx.AsyncClient() as client:
-        result = await client.post(verification_url, data=data)
-        result = result.json()
-    return result.get('success')
-
 
 class UploadImage(FlaskForm):
     image = FileField('image', validators=[
@@ -39,18 +28,13 @@ class UploadImage(FlaskForm):
     submit = SubmitField('Submit')
 
 
-key_bg = 'uFXtUWDYEtLz3Ee2c6rjmj93'
-
-
 def remove_bg(image_content: bytes):
-    response = httpx.post(
-        'https://api.remove.bg/v1.0/removebg',
-        files={'image_file': image_content},
-        data={'size': 'auto'},
-        headers={'X-Api-Key': key_bg},
-    )
-    if response.status_code == 200:
-        return response.content
+    try:
+        r_image = remove(image_content)
+
+        return r_image
+    except UnidentifiedImageError:
+        return False
 
 
 def generate_unique_filename(file_name: str):
@@ -75,11 +59,6 @@ def upload_image():
         for field, errors in form.errors.items():
             for error in errors:
                 flash(f'{error}', 'danger')
-        return redirect(url_for('main.index'))
-
-    recaptcha_response = request.form.get('g-recaptcha-response')
-    if not recaptcha_response or not asyncio.run(recaptcha_validation(recaptcha_response)):
-        flash('reCAPTCHA validation failed. Please try again or check the captcha.', 'danger')
         return redirect(url_for('main.index'))
 
     file = form.image.data
