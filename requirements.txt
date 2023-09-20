@@ -1,0 +1,6 @@
+MarkupSafe
+Flask
+Werkzeug
+Flask-WTF
+gunicorn==21.2.0
+httpx
