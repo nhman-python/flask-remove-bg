@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}History Images{% endblock %}
+{% block page_title %}History Images{% endblock %}
+{% block content %}
+<div class="container" style="max-height: 80vh; overflow-y: auto;">
+    <ul class="image-list">
+        {% if links %}
+        {% for link in links %}
+        <li class="image-item">
+            <a class="image-link" href="{{ link }}" download="{{ link }}">
+                <img src="{{ link }}" alt="{{ link }}" class="image img-fluid small-image" onload="this.classList.add('loaded')">
+            </a>
+        </li>
+        {% endfor %}
+        {% else %}
+        <p class="no-images">No processed images found.</p>
+        {% endif %}
+    </ul>
+</div>
+{% endblock %}
