@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Background Remover{% endblock %}
+{% block page_title %}Background Remover{% endblock %}
+{% block content %}
+<div class="container">
+    <form method="POST" action="/upload" enctype="multipart/form-data" id="upload-form">
+        {{ form.hidden_tag() }}
+        <div class="drop-zone" id="image-drop-zone">
+            <label for="image" class="custom-file-button">Select Image</label>
+            <input type="file" id="image" name="image" style="display:none" required accept="image/*" onchange="displayFileName(this)">
+        </div>
+        <div id="preview"></div>
+        <div class="form-group">
+            <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+            <div class="h-captcha" data-sitekey="dac4fb72-91f4-413c-a16c-54f62f30cbd0" style="max-width: 100%;"></div>
+        </div>
+        <button type="submit" class="btn btn-primary" id="submit-button">Submit</button>
+    </form>
+    <div class="alert" id="alert" style="display: none;"></div>
+</div>
+
+<script>
+    // JavaScript function to display the selected file name
+    function displayFileName(input) {
+        const fileNameDisplay = document.getElementById("fileNameDisplay");
+        if (input.files.length > 0) {
+            fileNameDisplay.innerText = input.files[0].name;
+        } else {
+            fileNameDisplay.innerText = "";
+        }
+    }
+</script>
+{% endblock %}
