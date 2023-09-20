@@ -100,9 +100,6 @@ def history():
 @main.route('/uploads/<filename>')
 def uploaded_image(filename: str):
     user_links: list[str] = session.get('downloads_links', [])
-    print(user_links)
-    print(filename)
-
     if any(link.endswith(filename) for link in user_links):
         return send_from_directory(UPLOAD_FOLDER, filename)
     else:
