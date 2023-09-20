@@ -1,8 +1,6 @@
-import asyncio
 import uuid
-import httpx
 import markupsafe
-from flask import url_for, render_template, flash, send_from_directory, redirect, session, Blueprint, request, abort
+from flask import url_for, render_template, flash, send_from_directory, redirect, session, Blueprint, abort
 from werkzeug.utils import secure_filename
 import os
 from rembg import remove
@@ -17,7 +15,6 @@ main = Blueprint('main', __name__)
 main.secret_key = os.urandom(32)
 allow_extension = ['png', 'jpeg', 'jpg']
 UPLOAD_FOLDER = 'static/upload'
-
 
 
 class UploadImage(FlaskForm):
@@ -100,6 +97,9 @@ def history():
 @main.route('/uploads/<filename>')
 def uploaded_image(filename: str):
     user_links: list[str] = session.get('downloads_links', [])
+    print(user_links)
+    print(filename)
+
     if any(link.endswith(filename) for link in user_links):
         return send_from_directory(UPLOAD_FOLDER, filename)
     else:
